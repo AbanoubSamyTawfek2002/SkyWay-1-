@@ -246,7 +246,7 @@ function AppRoutes() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/SkyWay-1-/">
+    <BrowserRouter>
       <ThemeProvider>
         <CurrencyProvider>
           <AuthProvider>
