@@ -1,5 +1,4 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { API_URL } from "../App"; // استيراد الرابط لتوحيد المسارات
 
 interface User {
   id: string;
@@ -24,27 +23,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  // الكود ده بيشتغل أول ما الموقع يفتح عشان يشوف لو المستخدم مسجل دخول قبل كدة
+  a;
   useEffect(() => {
     const savedUser = localStorage.getItem("skyway_user");
     const savedToken = localStorage.getItem("skyway_token");
 
     if (savedUser && savedToken) {
-      try {
-        setUser(JSON.parse(savedUser));
-        setToken(savedToken);
-      } catch (error) {
-        console.error(
-          "خطأ في قراءة بيانات المستخدم من الذاكرة المحلية:",
-          error,
-        );
-      }
+      setUser(JSON.parse(savedUser));
+      setToken(savedToken);
     }
     setIsLoading(false);
   }, []);
 
-  // دالة تسجيل الدخول: بنناديها بعد نجاح طلب الـ fetch من صفحة الـ Login
   const login = (userData: User, token: string) => {
     setUser(userData);
     setToken(token);
@@ -52,7 +42,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem("skyway_token", token);
   };
 
-  // دالة تسجيل الخروج
   const logout = () => {
     setUser(null);
     setToken(null);

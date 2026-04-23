@@ -1,7 +1,17 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Plane, Clock, ChevronDown, Star } from "lucide-react";
+import {
+  Plane,
+  Clock,
+  ArrowRight,
+  Star,
+  ChevronDown,
+  Calendar,
+  Users,
+  MapPin,
+  Search,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -11,9 +21,8 @@ import { SafeImage } from "../components/SafeImage";
 import { SkeletonFlightCard } from "../components/SkeletonLoaders";
 import { WishlistButton } from "../components/WishlistButton";
 import { ReviewSection } from "../components/ReviewSection";
-import { CategorySlider } from "../components/CategorySlider";
-// 🛑 الرابط مستورد هنا جاهز
 import { API_URL } from "../App";
+import { CategorySlider } from "../components/CategorySlider";
 
 const routeCategories = [
   { name: "All Routes", from: "", to: "" },
@@ -50,6 +59,7 @@ export default function FlightSearch() {
       params.set("page", page.toString());
       params.set("limit", "10");
 
+      // Add explicit from/to filters if they don't exist but activeRoute does
       if (activeRoute && activeRoute !== "All Routes") {
         const parts = activeRoute.split(" → ");
         if (parts.length === 2) {
@@ -62,8 +72,7 @@ export default function FlightSearch() {
       else setLoadingMore(true);
 
       try {
-        // 🔄 التعديل هنا: ربط المسار بـ API_URL الموحد
-        const res = await fetch(`${API_URL}/flights?${params.toString()}`);
+        const res = await fetch(`/api/flights?${params.toString()}`);
         const result = await res.json();
 
         if (isLoadMore) {
@@ -73,18 +82,18 @@ export default function FlightSearch() {
         }
         setPagination(result.pagination);
       } catch (err) {
-        console.error("Flight Fetch Error:", err);
+        console.error(err);
       } finally {
         setLoading(false);
         setLoadingMore(false);
       }
     },
-    [searchParams, pagination?.page, activeRoute],
+    [searchParams, pagination?.page],
   );
 
   useEffect(() => {
     fetchFlights();
-  }, [fetchFlights]); // تم تحديث الـ dependency لزيادة الاستقرار
+  }, [searchParams]);
 
   const handleRouteSelect = (routeName: string) => {
     setActiveRoute(routeName);
@@ -117,6 +126,7 @@ export default function FlightSearch() {
           </p>
         </div>
 
+        {/* Route Sliders */}
         <div className="w-full xl:w-[800px]">
           <CategorySlider
             categories={routeCategories.map((r) => r.name)}
@@ -142,9 +152,10 @@ export default function FlightSearch() {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: (i % 5) * 0.05 }}
               >
-                <Card className="overflow-hidden border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] bg-card rounded-[40px] transition-all hover:shadow-primary/10 group">
+                <Card className="overflow-hidden border-none shadow-[0_32px_64px_-12px_rgba(0,0,0,0.1)] dark:shadow-[0_32px_64px_-12px_rgba(0,0,0,0.3)] bg-card rounded-[40px] transition-all hover:shadow-primary/10">
                   <CardContent className="p-0">
                     <div className="flex flex-col lg:flex-row items-stretch">
+                      {/* Airline Section */}
                       <div className="lg:w-1/4 p-10 bg-muted/20 flex flex-col items-center justify-center border-b lg:border-b-0 lg:border-r border-border/50">
                         <SafeImage
                           src={flight.airlineLogo}
@@ -164,6 +175,7 @@ export default function FlightSearch() {
                         </div>
                       </div>
 
+                      {/* Flight Route */}
                       <div className="lg:w-2/4 p-8 sm:p-12 flex flex-col md:flex-row items-center justify-between gap-12 flex-1">
                         <div className="text-center md:text-left min-w-[120px]">
                           <p className="text-[10px] font-black uppercase tracking-[0.3em] text-muted-foreground mb-3">
@@ -187,7 +199,7 @@ export default function FlightSearch() {
                           </div>
                           <div className="w-full relative flex items-center justify-center py-4">
                             <div className="absolute inset-x-0 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
-                            <div className="relative bg-background border-2 border-border w-10 h-10 rounded-full flex items-center justify-center shadow-lg group-hover:rotate-45 transition-transform">
+                            <div className="relative bg-background border-2 border-border w-10 h-10 rounded-full flex items-center justify-center shadow-lg transform group-hover:rotate-45 transition-transform">
                               <Plane
                                 size={16}
                                 className="text-primary rotate-90"
@@ -222,6 +234,7 @@ export default function FlightSearch() {
                         </div>
                       </div>
 
+                      {/* Side Actions */}
                       <div className="lg:w-1/4 p-10 bg-primary/5 flex flex-row lg:flex-col justify-between lg:justify-center items-center lg:items-end lg:border-l border-border/50">
                         <div className="text-left lg:text-right mb-6">
                           <div className="flex items-center lg:justify-end gap-2 text-primary font-black mb-3">
@@ -234,7 +247,7 @@ export default function FlightSearch() {
                             </span>
                           </div>
                           <div className="flex items-baseline gap-1 lg:justify-end">
-                            <span className="text-5xl font-black tracking-tighter italic text-primary">
+                            <span className="text-5xl font-black tracking-tighter italic">
                               {formatPrice(flight.price)}
                             </span>
                           </div>
